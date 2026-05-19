@@ -1032,7 +1032,6 @@ function showStation(idx) {
   // Suspect badge HTML
   let badgeHtml = '';
   if (s.suspect) {
-    const clearedHtml = s.cleared ? '<span class="cleared-badge">✓ CLEARED</span>' : '';
     badgeHtml = `<div class="suspect-badge">${s.suspect}${clearedHtml}</div>`;
   } else if (s.isShared) {
     badgeHtml = `<div class="suspect-badge" style="border-color:rgba(108,61,138,0.5);color:#c5b0e8;background:rgba(108,61,138,0.08);">⚡ BOTH HOUSES COMPETE</div>`;
@@ -1168,15 +1167,15 @@ function renderFinaleStep(step) {
         <h2 class="finale-heading">Present Your Evidence</h2>
         <p class="text-parchment text-italic">You have gathered the clues. The Silencing Draught vial. The star map. The ink-stained gloves. Every suspect has been investigated. Every alibi has been checked. Only one name remains.</p>
         <div class="suspect-list">
-          <div class="suspect-row"><span>🔭 Professor Orion Dusk</span><span class="status-cleared">✓ CLEARED</span></div>
-          <div class="suspect-row"><span>🌿 Madame Briar</span><span class="status-cleared">✓ CLEARED</span></div>
-          <div class="suspect-row"><span>🧪 Dr. Vex</span><span class="status-cleared">✓ CLEARED</span></div>
-          <div class="suspect-row"><span>🎭 Sister Mox</span><span class="status-cleared">✓ CLEARED</span></div>
-          <div class="suspect-row"><span>📜 The Archivist</span><span class="status-unknown">?</span></div>
+        <div class="suspect-row"><span>🔭 Professor Orion Dusk</span></div>
+        <div class="suspect-row"><span>🌿 Madame Briar</span></div>
+        <div class="suspect-row"><span>🧪 Dr. Vex</span></div>
+        <div class="suspect-row"><span>🎭 Sister Mox</span></div>
+        <div class="suspect-row"><span>📜 The Archivist</span></div>
         </div>
         <div class="accuse-wrap">
           <div class="codeword-label">Name the killer:</div>
-          <input class="accuse-input" id="accuseInput" type="text" autocomplete="off" placeholder="The Archivist"
+            <input class="accuse-input" id="accuseInput" type="text" autocomplete="off" placeholder="Enter suspect name..."
             onkeydown="if(event.key==='Enter')submitAccuse()">
           <button class="accuse-btn" onclick="submitAccuse()">⚡ ACCUSE</button>
           <div class="feedback-msg" id="accuseMsg"></div>
