@@ -3,1025 +3,1315 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Grimoire Mystery — Meera's Birthday Game Design</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<title>The Grimoire Mystery — Phoenix Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --deep: #0d0a1a;
-    --ink: #1a1428;
-    --parchment: #f5edd8;
-    --parchment-dark: #e8d9b8;
-    --phoenix: #c0392b;
-    --phoenix-light: #e74c3c;
-    --serpent: #1a6b8a;
-    --serpent-light: #2980b9;
-    --purple: #6c3d8a;
-    --green: #2e7d4f;
-    --amber: #b8730a;
-  }
+/* ===== CSS CUSTOM PROPERTIES ===== */
+:root {
+  --deep: #0d0a1a;
+  --ink: #1a1428;
+  --parchment: #f5edd8;
+  --parchment-muted: rgba(245,237,216,0.7);
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --phoenix: #c0392b;
+  --phoenix-light: #e74c3c;
+  --serpent: #1a6b8a;
+  --serpent-light: #2980b9;
+  --purple: #6c3d8a;
+  --green: #2e7d4f;
+  --team-color: #c0392b;
+  --team-light: #e74c3c;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ===== BASE RESET ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
-    background: var(--deep);
-    color: var(--parchment);
-    font-family: 'Crimson Text', Georgia, serif;
-    font-size: 17px;
-    line-height: 1.75;
-  }
+body {
+  background: var(--deep);
+  color: var(--parchment);
+  font-family: 'Crimson Text', serif;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+}
 
-  .stars {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 0;
-    background: radial-gradient(ellipse at 20% 50%, rgba(108,61,138,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(26,107,138,0.08) 0%, transparent 60%);
-  }
+/* ===== BACKGROUND GRADIENT ===== */
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(108,61,138,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 50%, rgba(26,107,138,0.08) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
 
-  .page { max-width: 860px; margin: 0 auto; padding: 40px 32px; position: relative; z-index: 1; }
+/* ===== STARS ===== */
+.stars-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.star {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  animation: twinkle var(--dur, 3s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.15; }
+}
+@keyframes starDrift {
+  0% { transform: translateY(0) scale(1); opacity: 0.7; }
+  100% { transform: translateY(-50px) scale(1.3); opacity: 0.1; }
+}
+.star.celebrate {
+  animation: starDrift var(--dur, 4s) ease-in-out var(--delay, 0s) infinite alternate,
+             twinkle 1.5s ease-in-out var(--delay, 0s) infinite;
+}
 
-  /* TITLE BLOCK */
-  .title-block {
-    text-align: center;
-    padding: 60px 0 40px;
-    border-bottom: 1px solid rgba(201,168,76,0.3);
-    margin-bottom: 48px;
-  }
-  .title-block .eyebrow {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 4px;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    opacity: 0.8;
-  }
-  .title-block h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 42px;
-    font-weight: 700;
-    color: var(--gold-light);
-    line-height: 1.2;
-    margin-bottom: 12px;
-  }
-  .title-block .subtitle {
-    font-style: italic;
-    color: rgba(245,237,216,0.65);
-    font-size: 19px;
-  }
-  .ornament { color: var(--gold); opacity: 0.5; font-size: 22px; margin: 0 12px; }
+/* ===== HEADER ===== */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(13,10,26,0.97);
+  border-bottom: 1px solid rgba(201,168,76,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 200;
+}
+.header.purple-mode { border-bottom-color: rgba(108,61,138,0.4); }
 
-  /* SECTION */
-  .section {
-    margin-bottom: 52px;
-  }
-  .section-title {
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(201,168,76,0.2);
-  }
+.hdr-team {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 1px;
+  min-width: 180px;
+}
+.hdr-station {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  color: var(--parchment);
+  text-align: center;
+  flex: 1;
+  padding: 0 12px;
+}
+.hdr-station.purple-mode { color: #c5b0e8; }
+.hdr-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+  justify-content: flex-end;
+}
+.pause-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.5);
+  color: var(--gold);
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+.pause-btn:hover { background: rgba(201,168,76,0.12); }
+.timer {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--gold);
+  min-width: 72px;
+  text-align: right;
+  line-height: 1;
+}
+.timer.warning {
+  color: var(--phoenix);
+  animation: timerPulse 1s ease-in-out infinite;
+}
+.timer.zero { color: var(--phoenix); }
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
-  /* STORY SCROLL */
-  .story-scroll {
-    background: rgba(245,237,216,0.04);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-left: 3px solid var(--gold);
-    border-radius: 4px;
-    padding: 28px 32px;
-    font-style: italic;
-    font-size: 18px;
-    line-height: 1.85;
-    color: rgba(245,237,216,0.9);
-  }
-  .story-scroll strong { font-style: normal; color: var(--gold-light); font-weight: 600; }
+/* ===== PROGRESS BAR ===== */
+.progress-wrap {
+  position: fixed;
+  top: 60px; left: 0; right: 0;
+  height: 36px;
+  background: rgba(13,10,26,0.95);
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 199;
+  padding: 0 48px;
+}
+.progress-wrap.hidden { display: none; }
+.progress-track {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  height: 3px;
+  background: rgba(245,237,216,0.08);
+  border-radius: 2px;
+}
+.progress-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.progress-dots {
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+}
+.pdot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 2px solid rgba(201,168,76,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  color: rgba(245,237,216,0.4);
+  transition: all 0.4s;
+}
+.pdot.done { background: var(--gold); border-color: var(--gold); color: var(--deep); }
+.pdot.cur { background: var(--team-color); border-color: var(--team-color); color: #fff; box-shadow: 0 0 8px var(--team-color); }
 
-  /* GROUP HEADER */
-  .group-header {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-  .group-badge {
-    display: inline-block;
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 2px;
-    padding: 8px 20px;
-    border-radius: 3px;
-    font-weight: 600;
-  }
-  .badge-phoenix { background: rgba(192,57,43,0.15); border: 1px solid var(--phoenix); color: #e88; }
-  .badge-serpent { background: rgba(26,107,138,0.15); border: 1px solid var(--serpent); color: #7bc; }
-  .badge-shared  { background: rgba(108,61,138,0.15); border: 1px solid var(--purple); color: #c9a; }
+/* ===== MAIN WRAPPER ===== */
+#screen {
+  position: fixed;
+  top: 96px; left: 0; right: 0; bottom: 0;
+  overflow-y: auto;
+  z-index: 10;
+  transition: opacity 0.4s ease;
+}
+#screen.fading { opacity: 0; }
+#screen.no-progress-bar { top: 60px; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--deep); }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 3px; }
 
-  /* STATION CARD */
-  .station {
-    border: 1px solid rgba(201,168,76,0.15);
-    border-radius: 6px;
-    margin-bottom: 28px;
-    overflow: hidden;
-  }
-  .station-header {
-    padding: 16px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .station-header.phoenix { background: rgba(192,57,43,0.12); border-bottom: 1px solid rgba(192,57,43,0.2); }
-  .station-header.serpent { background: rgba(26,107,138,0.12); border-bottom: 1px solid rgba(26,107,138,0.2); }
-  .station-header.shared  { background: rgba(108,61,138,0.12); border-bottom: 1px solid rgba(108,61,138,0.2); }
-  .station-header.final   { background: rgba(201,168,76,0.12); border-bottom: 1px solid rgba(201,168,76,0.3); }
+/* ===== OPENING SCREEN ===== */
+.open-screen {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 36px 60px 48px;
+  gap: 20px;
+}
+.crest { font-size: 44px; color: var(--gold); text-shadow: 0 0 24px rgba(201,168,76,0.5); }
+.main-title {
+  font-family: 'Cinzel', serif;
+  font-size: 46px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 5px;
+  text-align: center;
+  text-shadow: 0 0 40px rgba(201,168,76,0.35);
+}
+.main-subtitle {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 21px;
+  color: var(--parchment-muted);
+  text-align: center;
+}
+.divider { color: var(--gold); font-size: 16px; letter-spacing: 14px; }
+.story-scroll {
+  background: rgba(245,237,216,0.035);
+  border-left: 3px solid var(--gold);
+  border-radius: 3px;
+  padding: 24px 32px;
+  max-width: 700px;
+  width: 100%;
+}
+.story-scroll p {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 16.5px;
+  color: var(--parchment);
+  line-height: 1.85;
+  margin-bottom: 14px;
+}
+.story-scroll p:last-child { margin-bottom: 0; }
+.begin-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  background: var(--gold);
+  color: var(--deep);
+  border: none;
+  padding: 15px 48px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 8px;
+}
+.begin-btn:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
 
-  .station-num {
-    font-family: 'Cinzel', serif;
-    font-size: 22px;
-    font-weight: 700;
-    min-width: 36px;
-    opacity: 0.5;
-  }
-  .station-num.phoenix { color: var(--phoenix); }
-  .station-num.serpent { color: var(--serpent); }
-  .station-num.shared  { color: var(--purple); }
-  .station-num.final   { color: var(--gold); }
+/* ===== STATION SCREEN ===== */
+.station-screen {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 52px 40px;
+  gap: 16px;
+}
 
-  .station-info h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--parchment);
-    margin-bottom: 3px;
-  }
-  .station-meta {
-    font-size: 13px;
-    color: rgba(245,237,216,0.5);
-    font-family: 'Crimson Text', serif;
-  }
+/* Suspect badge */
+.suspect-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--gold);
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.3);
+  padding: 5px 14px;
+  border-radius: 20px;
+  align-self: flex-start;
+}
+.cleared-badge {
+  font-size: 11px;
+  color: var(--green);
+  background: rgba(46,125,79,0.15);
+  border: 1px solid rgba(46,125,79,0.5);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
 
-  .station-body { padding: 22px 24px; }
+/* Briefing box */
+.briefing-box {
+  background: rgba(245,237,216,0.03);
+  border-left: 3px solid var(--gold);
+  border-radius: 3px;
+  padding: 18px 26px;
+}
+.box-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.briefing-box p {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 16.5px;
+  color: var(--parchment);
+  line-height: 1.8;
+}
 
-  /* BLOCKS INSIDE STATION */
-  .block {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(245,237,216,0.07);
-  }
-  .block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+/* Puzzle box */
+.puzzle-box {
+  background: rgba(10,8,20,0.55);
+  border: 1px dashed rgba(201,168,76,0.4);
+  border-radius: 3px;
+  padding: 18px 26px;
+}
+.puzzle-box p {
+  font-family: 'Crimson Text', serif;
+  font-size: 16.5px;
+  color: var(--parchment-muted);
+  line-height: 1.8;
+}
 
-  .block-label {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    opacity: 0.7;
-    margin-bottom: 8px;
-  }
+/* Riddle box (used for station 4 serpent, not needed here but good to have) */
+.riddle-box {
+  background: rgba(201,168,76,0.04);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 3px;
+  padding: 16px 22px;
+  margin-top: 12px;
+}
+.riddle-box p {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--parchment-muted);
+  line-height: 1.9;
+}
 
-  .block p { color: rgba(245,237,216,0.85); }
+/* Decoder grid (Station 6) */
+.decoder-grid {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.dc-cell {
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.45);
+  border-radius: 6px;
+  padding: 10px 14px;
+  text-align: center;
+  min-width: 52px;
+  box-shadow: 0 0 8px rgba(201,168,76,0.08) inset;
+}
+.dc-num { display: block; font-family: 'Cinzel', serif; font-size: 12px; color: var(--gold); margin-bottom: 4px; }
+.dc-letter { display: block; font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; color: #f0a832; }
 
-  .puzzle-box {
-    background: rgba(0,0,0,0.25);
-    border: 1px dashed rgba(201,168,76,0.25);
-    border-radius: 4px;
-    padding: 16px 20px;
-    font-size: 16px;
-    color: rgba(245,237,216,0.8);
-  }
-  .puzzle-box .answer {
-    margin-top: 10px;
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    color: var(--gold-light);
-    letter-spacing: 1px;
-  }
+/* Evidence box */
+.evidence-box {
+  background: rgba(46,125,79,0.07);
+  border: 1px solid rgba(46,125,79,0.5);
+  border-radius: 3px;
+  padding: 0 26px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.7s ease, opacity 0.6s ease, padding 0.4s ease;
+}
+.evidence-box.revealed {
+  max-height: 500px;
+  opacity: 1;
+  padding: 18px 26px;
+}
+.evidence-box.critical {
+  background: rgba(201,168,76,0.06);
+  border-color: rgba(201,168,76,0.6);
+  box-shadow: 0 0 24px rgba(201,168,76,0.12);
+}
+.evidence-box .box-label { color: var(--green); }
+.evidence-box.critical .box-label { color: var(--gold); }
+.evidence-box p {
+  font-family: 'Crimson Text', serif;
+  font-size: 16px;
+  color: var(--parchment-muted);
+  line-height: 1.8;
+  margin-bottom: 10px;
+}
+.evidence-box p:last-child { margin-bottom: 0; }
+.souvenir-tag {
+  display: inline-block;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--green);
+  background: rgba(46,125,79,0.15);
+  border: 1px solid rgba(46,125,79,0.4);
+  padding: 4px 12px;
+  border-radius: 3px;
+  margin-top: 6px;
+}
 
-  .screen-box {
-    background: rgba(10,8,20,0.7);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 6px;
-    padding: 20px 22px;
-    font-size: 15px;
-    color: rgba(245,237,216,0.75);
-    line-height: 1.7;
-  }
-  .screen-box .screen-title {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 2px;
-    color: var(--gold);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-  }
-  .screen-box .code-word {
-    display: inline-block;
-    margin-top: 10px;
-    background: rgba(201,168,76,0.1);
-    border: 1px solid var(--gold);
-    border-radius: 3px;
-    padding: 4px 14px;
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    color: var(--gold-light);
-    letter-spacing: 2px;
-  }
+/* ===== CODEWORD INPUT ===== */
+.codeword-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 0 12px;
+}
+.codeword-label { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; }
+.codeword-row { display: flex; gap: 10px; align-items: center; }
+.codeword-input {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  background: rgba(13,10,26,0.85);
+  border: 2px solid var(--gold);
+  color: var(--parchment);
+  padding: 11px 22px;
+  border-radius: 4px;
+  text-align: center;
+  width: 280px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.codeword-input:focus { border-color: var(--gold-light); box-shadow: 0 0 14px rgba(201,168,76,0.18); }
+.codeword-input.error { border-color: var(--phoenix) !important; animation: shake 0.45s ease; box-shadow: none !important; }
+.codeword-input.success { border-color: var(--gold-light) !important; box-shadow: 0 0 22px rgba(201,168,76,0.5), 0 0 48px rgba(201,168,76,0.18) !important; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  15% { transform: translateX(-9px); }
+  35% { transform: translateX(9px); }
+  55% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.submit-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  background: var(--team-color);
+  color: var(--gold);
+  border: none;
+  padding: 13px 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.submit-btn:hover { background: var(--team-light); transform: translateY(-1px); }
+.submit-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+.feedback-msg {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-align: center;
+  min-height: 18px;
+}
+.feedback-msg.ok { color: var(--gold); }
+.feedback-msg.err { color: var(--phoenix-light); }
 
-  .souvenir-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(46,125,79,0.12);
-    border: 1px solid rgba(46,125,79,0.35);
-    border-radius: 20px;
-    padding: 5px 16px;
-    font-size: 14px;
-    color: #9dccb0;
-    margin-top: 6px;
-  }
+/* ===== ADVANCE BUTTON ===== */
+.advance-btn {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  background: var(--gold);
+  color: var(--deep);
+  border: none;
+  padding: 14px 40px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin: 14px auto 0;
+}
+.advance-btn:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+.advance-btn.hidden { display: none; }
 
-  .evidence-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(184,115,10,0.12);
-    border: 1px solid rgba(184,115,10,0.35);
-    border-radius: 20px;
-    padding: 5px 16px;
-    font-size: 14px;
-    color: #e8c97a;
-    margin-top: 6px;
-  }
+/* ===== FINALE SCREENS ===== */
+.finale-screen {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 52px 48px;
+  gap: 22px;
+}
+.step-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(245,237,216,0.35);
+  text-transform: uppercase;
+}
+.finale-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 3px;
+}
+.suspect-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; }
+.suspect-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  background: rgba(245,237,216,0.025);
+  border: 1px solid rgba(245,237,216,0.08);
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--parchment);
+}
+.status-cleared { color: var(--green); font-size: 12px; }
+.status-unknown { color: var(--gold); font-size: 20px; }
 
-  /* SUSPECT PROFILES */
-  .suspect-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 8px;
-  }
-  .suspect-card {
-    background: rgba(245,237,216,0.03);
-    border: 1px solid rgba(201,168,76,0.15);
-    border-radius: 6px;
-    padding: 18px 20px;
-  }
-  .suspect-name {
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    color: var(--gold-light);
-    margin-bottom: 6px;
-    font-weight: 600;
-  }
-  .suspect-desc { font-size: 15px; color: rgba(245,237,216,0.7); line-height: 1.6; }
-  .suspect-motive { margin-top: 8px; font-size: 13px; color: rgba(245,237,216,0.5); font-style: italic; }
-  .culprit-reveal {
-    grid-column: 1 / -1;
-    background: rgba(201,168,76,0.08);
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    padding: 20px 24px;
-    text-align: center;
-  }
-  .culprit-reveal h4 { font-family: 'Cinzel', serif; color: var(--gold-light); font-size: 15px; margin-bottom: 8px; }
-  .culprit-reveal p { font-size: 15px; color: rgba(245,237,216,0.8); }
+.accuse-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+.accuse-input {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(13,10,26,0.85);
+  border: 2px solid rgba(201,168,76,0.4);
+  color: var(--parchment);
+  padding: 11px 22px;
+  border-radius: 4px;
+  text-align: center;
+  width: 100%;
+  max-width: 380px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.accuse-input:focus { border-color: var(--gold); }
+.accuse-input.error { border-color: var(--phoenix) !important; animation: shake 0.45s ease; }
+.accuse-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  background: var(--phoenix);
+  color: #fff;
+  border: none;
+  padding: 13px 40px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.accuse-btn:hover { background: var(--phoenix-light); }
 
-  /* MEERA FINALE */
-  .finale-block {
-    background: rgba(201,168,76,0.05);
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 8px;
-    padding: 32px;
-    text-align: center;
-  }
-  .finale-block h3 { font-family: 'Cinzel', serif; font-size: 22px; color: var(--gold-light); margin-bottom: 16px; }
-  .finale-block p { font-size: 17px; font-style: italic; color: rgba(245,237,216,0.85); line-height: 1.85; }
-  .incantation {
-    margin: 20px auto;
-    max-width: 480px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(201,168,76,0.4);
-    border-radius: 4px;
-    padding: 18px 24px;
-    font-family: 'Cinzel', serif;
-    font-size: 15px;
-    color: var(--gold-light);
-    letter-spacing: 1px;
-    line-height: 1.8;
-  }
+/* Reveal step */
+.reveal-bg { animation: revealPulse 4s ease-in-out infinite; }
+@keyframes revealPulse {
+  0%,100% { background: rgba(13,10,26,0); }
+  50% { background: rgba(201,168,76,0.025); }
+}
+.evidence-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; width: 100%; }
+.ev-card {
+  flex: 1;
+  min-width: 200px;
+  max-width: 260px;
+  background: rgba(245,237,216,0.03);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 6px;
+  padding: 18px;
+}
+.ev-card-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  display: block;
+}
+.ev-card p {
+  font-family: 'Crimson Text', serif;
+  font-size: 14.5px;
+  color: var(--parchment-muted);
+  line-height: 1.7;
+}
+.motive-box {
+  background: rgba(245,237,216,0.025);
+  border-left: 3px solid var(--gold);
+  padding: 18px 26px;
+  max-width: 660px;
+  width: 100%;
+  border-radius: 0 3px 3px 0;
+}
+.motive-box p {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 16.5px;
+  color: var(--parchment);
+  line-height: 1.85;
+  margin-bottom: 12px;
+}
+.motive-box p:last-child { margin-bottom: 0; }
+.justice { font-family: 'Cinzel', serif; font-size: 17px; color: var(--gold); letter-spacing: 4px; }
 
-  /* DIVIDER */
-  .divider {
-    text-align: center;
-    color: rgba(201,168,76,0.3);
-    margin: 40px 0;
-    font-size: 20px;
-    letter-spacing: 12px;
-  }
+/* Envelope */
+.envelope {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 44px;
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  background: rgba(201,168,76,0.04);
+  box-shadow: 0 0 30px rgba(201,168,76,0.1);
+}
+.envelope .env-icon { font-size: 48px; }
+.envelope .env-label { font-family: 'Cinzel', serif; font-size: 17px; color: var(--gold); letter-spacing: 4px; }
 
-  /* LAPTOP SCREEN NOTE */
-  .laptop-note {
-    background: rgba(26,107,138,0.08);
-    border-left: 3px solid var(--serpent);
-    padding: 12px 18px;
-    border-radius: 0 4px 4px 0;
-    font-size: 14px;
-    color: rgba(245,237,216,0.65);
-    margin-top: 10px;
-  }
+/* Parchment letter */
+.parchment-letter {
+  background: rgba(245,237,216,0.06);
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 4px;
+  padding: 28px 36px;
+  max-width: 580px;
+  width: 100%;
+  box-shadow: 0 0 40px rgba(201,168,76,0.06) inset;
+}
+.parchment-letter p {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 17.5px;
+  color: var(--parchment);
+  line-height: 1.95;
+  margin-bottom: 14px;
+}
+.parchment-letter p:last-child { margin-bottom: 0; }
 
-  /* DECODER TABLE */
-  .decoder-table {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-  }
-  .decoder-cell {
-    background: rgba(201,168,76,0.08);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 4px;
-    padding: 8px 10px;
-    text-align: center;
-    min-width: 52px;
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-  }
-  .decoder-num { color: var(--gold); font-size: 15px; font-weight: 600; }
-  .decoder-let { color: rgba(245,237,216,0.7); font-size: 12px; margin-top: 2px; }
+/* Incantation */
+.incantation-box {
+  background: rgba(13,10,26,0.8);
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  padding: 28px 44px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 24px rgba(201,168,76,0.12);
+}
+.incantation-box p {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  color: var(--gold);
+  line-height: 2.3;
+  letter-spacing: 2px;
+}
+.incant-big { font-size: 30px !important; font-weight: 700; letter-spacing: 6px !important; }
 
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    .suspect-grid { grid-template-columns: 1fr; }
-    .title-block h1 { font-size: 28px; }
-    .page { padding: 24px 20px; }
-  }
+/* Celebration */
+.celebration-title {
+  font-family: 'Cinzel', serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 4px;
+  animation: celebPulse 2.2s ease-in-out infinite;
+  text-shadow: 0 0 40px rgba(201,168,76,0.4);
+}
+@keyframes celebPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+.cert-badges { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.cert-badge {
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  padding: 22px 28px;
+  max-width: 310px;
+  text-align: center;
+  background: rgba(201,168,76,0.04);
+}
+.cert-title { font-family: 'Cinzel', serif; font-size: 15px; color: var(--gold); font-weight: 700; letter-spacing: 2px; margin-bottom: 8px; }
+.cert-body { font-family: 'Crimson Text', serif; font-size: 13.5px; color: var(--parchment-muted); line-height: 1.65; }
+
+/* Continue / nav buttons */
+.continue-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 11px 34px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 4px;
+}
+.continue-btn:hover { background: rgba(201,168,76,0.12); }
+
+/* Generic text helpers */
+.text-center { text-align: center; }
+.text-italic { font-style: italic; }
+.text-parchment { font-family: 'Crimson Text', serif; font-size: 16.5px; color: var(--parchment-muted); line-height: 1.8; text-align: center; max-width: 560px; }
+.text-parchment-large { font-family: 'Crimson Text', serif; font-size: 18px; color: var(--parchment); line-height: 1.85; text-align: center; max-width: 580px; }
+.gold-note { font-family: 'Cinzel', serif; font-size: 14px; color: var(--gold); letter-spacing: 2px; text-align: center; line-height: 1.7; }
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
-<div class="stars"></div>
-<div class="page">
 
-  <!-- TITLE -->
-  <div class="title-block">
-    <div class="eyebrow">Meera's 9th Birthday</div>
-    <h1>The Grimoire Mystery</h1>
-    <div class="subtitle"><span class="ornament">✦</span> A Magical Murder Mystery Treasure Hunt <span class="ornament">✦</span></div>
+<!-- ===== BACKGROUND ===== -->
+<div class="bg-gradient"></div>
+<div class="stars-container" id="starsContainer"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="mainHeader">
+  <div class="hdr-team">🔴 PHOENIX ORDER</div>
+  <div class="hdr-station" id="hdrStation">The Grimoire Mystery</div>
+  <div class="hdr-right">
+    <button class="pause-btn" id="pauseBtn" onclick="togglePause()">PAUSE</button>
+    <div class="timer" id="timer">5:00</div>
   </div>
+</header>
 
-  <!-- OVERVIEW -->
-  <div class="section">
-    <div class="section-title">Game Overview</div>
-    <div class="story-scroll">
-      <strong>18 players · 2 teams of 9 · 7 stations each · Age 9–10</strong><br><br>
-      Jasper the caretaker has been murdered. The Grimoire is missing. One of five suspects did it — and they're still inside the school. Two rival magical houses race through the enchanted school on different paths, gathering evidence from each crime scene. The team that completes all their stations first wins the race — but the murder cannot be solved until both teams combine their clues. Only then can the killer be named. And only <strong>Meera</strong> can open the Grimoire and reveal Jasper's final vision.
-    </div>
+<!-- ===== PROGRESS BAR ===== -->
+<div class="progress-wrap hidden" id="progressWrap">
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <div class="progress-dots" id="progressDots"></div>
   </div>
-
-  <!-- SUSPECTS -->
-  <div class="section">
-    <div class="section-title">The Suspects — All were inside Wyldmoor the night Jasper was killed</div>
-    <div class="suspect-grid">
-      <div class="suspect-card">
-        <div class="suspect-name">🔭 Professor Orion Dusk</div>
-        <div class="suspect-desc">The Astronomy teacher. Rarely sleeps. Was seen wandering the corridors near the Grimoire vault well past midnight. Claims he was sleepwalking.</div>
-        <div class="suspect-motive">Motive: The Grimoire contains a star spell that would let him live forever. Jasper once caught him trying to sneak into the vault — and warned him never to return.</div>
-      </div>
-      <div class="suspect-card">
-        <div class="suspect-name">🌿 Madame Briar</div>
-        <div class="suspect-desc">The Herbology professor. Kind and gentle — or so she seems. Her prized Moonbloom plant is dying, and only a Grimoire spell can save it.</div>
-        <div class="suspect-motive">Motive: Jasper discovered she had been secretly copying pages from the Grimoire. He threatened to report her the very next morning.</div>
-      </div>
-      <div class="suspect-card">
-        <div class="suspect-name">🧪 Dr. Vex</div>
-        <div class="suspect-desc">The Potions master. Brilliant but chaotic. His enchanted teapot-cat is the only witness to what happened in the dungeon that night.</div>
-        <div class="suspect-motive">Motive: A potion accident turned his beloved cat into a teapot. Only the Grimoire's reversal spell can fix it — and Jasper refused to give him access.</div>
-      </div>
-      <div class="suspect-card">
-        <div class="suspect-name">🎭 Sister Mox</div>
-        <div class="suspect-desc">The Transfiguration teacher. She can take the shape of any person, creature, or object. On the night of the murder — nobody is sure what form she was wearing.</div>
-        <div class="suspect-motive">Motive: Jasper told the Headmistress he suspected Sister Mox of impersonating other teachers to steal exam answers. She had every reason to silence him.</div>
-      </div>
-      <div class="suspect-card">
-        <div class="suspect-name">📜 The Archivist</div>
-        <div class="suspect-desc">No one knows their real name or where they came from. They appeared at the school years ago and were given a room in the archive. They have read every book in the school — except the Grimoire, which Jasper personally kept locked away from them.</div>
-        <div class="suspect-motive">Motive: The Grimoire's forbidden pages contain the Archivist's true identity — a secret they will do anything to possess. Jasper was the last one standing between them and it.</div>
-      </div>
-      <div class="culprit-reveal">
-        <h4>⚡ The Killer — Game Master Eyes Only</h4>
-        <p><strong>The Archivist murdered Jasper.</strong> They cornered him outside the vault, forced him to reveal the password, then cast a silencing spell. The Grimoire's forbidden pages reveal that the Archivist is actually a banished dark enchanter who erased their own name from the world — and only the Grimoire can restore it. The evidence trail: ink-stained gloves at the arcade (Phoenix), a torn Grimoire page with fingerprints at the arcade (Serpent), and a signed ingredient receipt proving they acquired a silence potion the day before the murder. The Grimoire's final vision — unlocked by Meera — shows Jasper's last moments and the Archivist's face.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- DECODER -->
-  <div class="section">
-    <div class="section-title">The Number Decoder (given to both teams at the start)</div>
-    <p style="color:rgba(245,237,216,0.7); margin-bottom:14px;">The number table (24–30) at the venue maps to key letters. Kids are given the full decoder card at the start and must keep it safe — they'll need it at multiple stations.</p>
-    <div class="decoder-table">
-      <div class="decoder-cell"><div class="decoder-num">24</div><div class="decoder-let">G</div></div>
-      <div class="decoder-cell"><div class="decoder-num">25</div><div class="decoder-let">R</div></div>
-      <div class="decoder-cell"><div class="decoder-num">26</div><div class="decoder-let">I</div></div>
-      <div class="decoder-cell"><div class="decoder-num">27</div><div class="decoder-let">M</div></div>
-      <div class="decoder-cell"><div class="decoder-num">28</div><div class="decoder-let">O</div></div>
-      <div class="decoder-cell"><div class="decoder-num">29</div><div class="decoder-let">I</div></div>
-      <div class="decoder-cell"><div class="decoder-num">30</div><div class="decoder-let">R</div></div>
-    </div>
-    <div class="laptop-note">The word spells GRIMOIR — the first six letters of GRIMOIRE. The final E is revealed only at the last station, completing the word and unlocking Meera's chest.</div>
-  </div>
-
-  <div class="divider">✦ ✦ ✦</div>
-
-  <!-- OPENING STORY -->
-  <div class="section">
-    <div class="section-title">The Opening Story — Read aloud at the Laptop Hub</div>
-    <div class="story-scroll">
-      Welcome, young witches, to the <strong>Wyldmoor School of Enchantment</strong>.<br><br>
-      Today should have been the most magical day of the year — the birthday of our most gifted student, <strong>Meera</strong>. But something terrible has happened. Something that cannot be undone with a simple spell.<br><br>
-      This morning, at the stroke of dawn, <strong>Jasper</strong> — the school's beloved caretaker, who had looked after Wyldmoor for forty years — was found dead. He was lying in the corridor outside the Grimoire vault. The vault door was open. And the <strong>Ancient Grimoire of Wonders</strong> — the most powerful book in existence — was gone.<br><br>
-      Jasper was the only one who knew the vault's secret password. Which means whoever killed him... made him talk first.<br><br>
-      The school is in shock. The teachers are too frightened to investigate — because the killer is still inside these walls. It has to be one of the five people who were in the school last night. But nobody will admit to anything.<br><br>
-      That is why you are here.<br><br>
-      Without the Grimoire, the school's magic is dying. The enchanted halls are going dark. The potions are turning to water. The glowing stars are blinking out one by one. And poor Jasper deserves justice.<br><br>
-      The Grimoire can only be restored by the one whose name is written on its cover. That name is <strong>Meera</strong>. But first — we must find who murdered Jasper and stole it from him.<br><br>
-      You have been divided into two elite investigative houses. <strong>The Phoenix Order</strong> will search the northern wings. <strong>The Serpent Circle</strong> will search the southern wings. Gather your evidence. Crack every seal. The house that returns first wins the race. But the murder? The murder must be solved together.<br><br>
-      Five suspects. One killer. Find them.<br><br>
-      <strong>Jasper is counting on you. Your investigation begins now.</strong>
-    </div>
-  </div>
-
-  <div class="divider">✦ ✦ ✦</div>
-
-  <!-- ===================== PHOENIX ORDER ===================== -->
-  <div class="section">
-    <div class="section-title">🔴 Phoenix Order — 7 Stations</div>
-    <div style="margin-bottom:24px;">
-      <span class="group-badge badge-phoenix">Phoenix Order</span>
-      <span style="margin-left:12px; font-size:15px; color:rgba(245,237,216,0.6);">Starts at: Astronomy Tower → Herbology → Potions → Transfiguration → Divination → Illumination → Final</span>
-    </div>
-
-    <!-- STATION A1 -->
-    <div class="station">
-      <div class="station-header phoenix">
-        <div class="station-num phoenix">01</div>
-        <div class="station-info">
-          <h3>Astronomy Tower</h3>
-          <div class="station-meta">📍 Climbing maze with slides and bridges · Suspect: Prof. Orion Dusk</div>
-        </div>
-      </div>
-      <div class="station-body">
-
-        <div class="block">
-          <div class="block-label">Laptop Screen — Clue Card Unlocked</div>
-          <div class="screen-box">
-            <div class="screen-title">🔴 Phoenix Order · Mission 1 of 7</div>
-            "Detectives — Professor Orion Dusk was seen climbing very high the night the Grimoire vanished. Perhaps he left something behind up there. Search the <strong>Astronomy Tower</strong> — the tall climbing structure — and find the sealed scroll hidden among the bridges. When you crack it, bring back the codeword."
-            <div class="code-word">Enter codeword to unlock Mission 2 →</div>
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Hidden Scroll (paper rolled up, tied with string)</div>
-          <div class="puzzle-box">
-            <strong>Star Cipher Riddle</strong> — The scroll contains a grid of stars (★ ☆). Each filled star (★) = 1, empty star (☆) = 0. Groups of 5 stars spell binary numbers that match letters. There are 5 groups spelling a word.<br><br>
-            <em>The scroll reads:</em><br>
-            ★☆★☆☆ = 10100 = T<br>
-            ★☆★★★ = 10111 = W (given key: A=00001 through Z=11010)<br>
-            <em>(Simplified version for 9-year-olds: Give them a star-to-letter key card. Each constellation picture = one letter. There are 5 constellations hidden in the climbing area, each labelled with a star picture that matches the key card.)</em><br><br>
-            <strong>Simpler version:</strong> 5 star-shaped cards are hidden along the climbing bridges. Each card has one letter on the back. Find all 5, arrange them in order of the numbers on the front (1–5).
-            <div class="answer">✦ Answer / Codeword: NIGHT</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: Professor Orion's star map — with the Grimoire vault corridor circled in red ink, and a note that reads "Jasper patrols at midnight." <em>(He knew Jasper's schedule. Very suspicious.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: Mini star map scroll (rolled paper with a constellation drawing)</div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">After entering "NIGHT" on laptop</div>
-          <div class="screen-box">
-            "The star map was found! Prof. Orion knew exactly when Jasper patrolled — but his telescope data may give him an alibi. File this evidence and move to your next crime scene: <strong>Herbology Grounds.</strong>"
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- STATION A2 -->
-    <div class="station">
-      <div class="station-header phoenix">
-        <div class="station-num phoenix">02</div>
-        <div class="station-info">
-          <h3>Herbology Grounds</h3>
-          <div class="station-meta">📍 Sand pit · Suspect: Madame Briar</div>
-        </div>
-      </div>
-      <div class="station-body">
-
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔴 Phoenix Order · Mission 2 of 7</div>
-            "Madame Briar tends her magical plants in the Herbology Grounds — a sandy, earthy place. She was seen digging late at night. Something is buried there. Find it."
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Dig in Sand</div>
-          <div class="puzzle-box">
-            <strong>Buried Letter Tiles:</strong> 6 letter tiles are buried in the sand pit (in small ziplock bags so they stay clean). Each tile has a letter on one side and a number (1–6) on the other. Dig them out, sort by number, read the word.<br><br>
-            Letters in order: <strong>P · E · T · A · L · S</strong>
-            <div class="answer">✦ Answer / Codeword: PETALS</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: A gardening glove with a purple stain — the same colour as Grimoire ink — and a crumpled note in the pocket that reads: <em>"Jasper knows. I have until morning."</em> <em>(Madame Briar was panicking the night of the murder.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: Small paper seed packet with a magical plant drawing inside</div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">After entering "PETALS"</div>
-          <div class="screen-box">
-            "The note is chilling — Madame Briar knew Jasper was going to report her. She had a reason to stop him. But did she? Keep the glove as evidence and move to: <strong>Potions Dungeon.</strong>"
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- STATION A3 -->
-    <div class="station">
-      <div class="station-header phoenix">
-        <div class="station-num phoenix">03</div>
-        <div class="station-info">
-          <h3>Potions Dungeon</h3>
-          <div class="station-meta">📍 Ball pit · Suspect: Dr. Vex</div>
-        </div>
-      </div>
-      <div class="station-body">
-
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔴 Phoenix Order · Mission 3 of 7</div>
-            "Dr. Vex's Potions Dungeon is a bubbling, chaotic place — full of floating orbs and strange ingredients. He claims he was in his lab all night. But something is hidden in the orb pool. Find the coloured potion bottles — the clue is inside."
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Balloon Pop</div>
-          <div class="puzzle-box">
-            <strong>Potion Balloon Pop:</strong> 6 small balloons are hidden in or around the ball pit (not inside — taped to the sides). Each balloon is a different colour. Only 5 are real clues — one is a red herring with the word WRONG inside. Inside each real balloon is a letter on a rolled paper strip. Pop the balloons, find the letters, arrange them using the colour order given on a clue card (Red, Blue, Green, Yellow, Purple).<br><br>
-            Letters: <strong>S · H · A · D · O · W</strong> (one wrong balloon contains X)
-            <div class="answer">✦ Answer / Codeword: SHADOW</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: Dr. Vex's alibi — his enchanted teapot-cat was with him brewing a reversal potion all night. The teapot rattles three times for YES and once for NO. It confirms: Dr. Vex never left the dungeon. <em>(He is cleared! He cannot be the killer.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: Mini potion bottle (small empty bottle with a cork and a label)</div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">After entering "SHADOW"</div>
-          <div class="screen-box">
-            "Dr. Vex is cleared! His teapot-cat rattled three times — he never left the dungeon all night. Cross him off. But the teapot also rattled about something else — it says it heard footsteps in the corridor above at exactly midnight. Someone was near the vault. Move to: <strong>Transfiguration Hall.</strong>"
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- STATION A4 -->
-    <div class="station">
-      <div class="station-header phoenix">
-        <div class="station-num phoenix">04</div>
-        <div class="station-info">
-          <h3>Transfiguration Hall</h3>
-          <div class="station-meta">📍 Pretend play zone (grocery store, hair salon, car garage) · Suspect: Sister Mox</div>
-        </div>
-      </div>
-      <div class="station-body">
-
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔴 Phoenix Order · Mission 4 of 7</div>
-            "Sister Mox can transform into anything — a broom, a cat, a jar of jam. She was spotted in the Transfiguration Hall the night of the theft. But which disguise was she wearing? Search the Hall's three rooms and find the hidden message. It's written in mirror writing — you'll need to hold it up to find the truth."
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Mirror Writing</div>
-          <div class="puzzle-box">
-            <strong>Reverse Message:</strong> A card is hidden in one of the three pretend play rooms (game master chooses — e.g. taped under the grocery store counter). The card has a message written in reverse / mirror writing. Kids hold it up to a mirror (small mirror provided at the station) to read it.<br><br>
-            Mirror message reads: <strong>"LOOK UNDER THE BLUE SHELF"</strong><br>
-            Under the blue shelf: a folded note with the codeword.
-            <div class="answer">✦ Answer / Codeword: MIRROR</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: A disguise kit — wigs, a dark cloak, and a face mask — found hidden behind the salon mirrors. And a schedule on the wall showing Sister Mox's student performance ran until midnight, signed by thirty witnesses. <em>(She is cleared! She has a rock-solid alibi.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: A small "disguise" card with stick-on moustache or fun sticker sheet</div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">After entering "MIRROR"</div>
-          <div class="screen-box">
-            "Sister Mox is cleared — thirty students watched her performance until after midnight. She could not have murdered Jasper. But the disguise kit is interesting... anyone could have borrowed it. Who else had access to this hall? Move to: <strong>Divination Market.</strong>"
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- STATION A5 -->
-    <div class="station">
-      <div class="station-header phoenix">
-        <div class="station-num phoenix">05</div>
-        <div class="station-info">
-          <h3>Divination Market</h3>
-          <div class="station-meta">📍 Mini arcade + trampoline basketball · Suspect: The Archivist</div>
-        </div>
-      </div>
-      <div class="station-body">
-
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔴 Phoenix Order · Mission 5 of 7</div>
-            "The Archivist haunts the Divination Market — a place where futures are sold like fruit. They know things nobody else knows. Find the word search they left behind. The hidden words will reveal a sentence — and that sentence will give you their secret."
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Word Search</div>
-          <div class="puzzle-box">
-            <strong>Word Search Grid (10×10):</strong> Hidden words: BOOK · INK · GLOVE · STOLEN · PAGES<br><br>
-            When all 5 words are circled, the leftover letters (reading top to bottom, left to right, skipping used letters) spell a message. For simplicity: the first letter of each found word, in order found, spells the codeword.<br><br>
-            Word found order clue card: BOOK (B) · INK (I) · GLOVE (G) · STOLEN (S) — 4 letters = BIGS? No — use full message approach.<br><br>
-            <em>Simpler version: The word search has 5 hidden words. The clue card says "read the first letter of each word, in the order shown on the card." Order card reads: STOLEN · INK · GLOVE · NIGHT → S·I·G·N = SIGN</em>
-            <div class="answer">✦ Answer / Codeword: SIGN</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: A pair of ink-stained gloves — small and delicate, smelling of old parchment and dust. Exactly the kind worn by someone who handles ancient books all day. And tucked inside one glove: a tiny vial, empty, labelled <em>"Silencing Draught."</em> The same spell used on Jasper. <em>(This is the murder weapon! This belongs to The Archivist.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: A fortune card with a silly personalised prediction written on it</div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">After entering "SIGN"</div>
-          <div class="screen-box">
-            "The Silencing Draught vial is devastating evidence. Jasper couldn't call for help because someone had silenced him first — and this vial was in The Archivist's glove. This is your most important find. Protect it. Move to: <strong>The Illumination Chamber</strong> — the Serpent Circle will be there too."
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- STATION A6 — SHARED -->
-    <div class="station">
-      <div class="station-header shared">
-        <div class="station-num shared">06</div>
-        <div class="station-info">
-          <h3>The Illumination Chamber</h3>
-          <div class="station-meta">📍 Glowing sticks wall · Both teams arrive here simultaneously · Shared challenge</div>
-        </div>
-      </div>
-      <div class="station-body">
-
-        <div class="block">
-          <div class="block-label">Laptop Screen — Both Teams See This</div>
-          <div class="screen-box">
-            <div class="screen-title">⚡ Both Houses — The Illumination Trial</div>
-            "Both houses have arrived at the Illumination Chamber — the school's magical communication wall. Before he was killed, Jasper hid one final message here in the light — a warning he knew only the bravest students would be able to decode. Work within your own team. The house that finishes first moves to the Final Chamber first — and gets to name the killer."
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Glowing Sticks (both teams, same puzzle, race)</div>
-          <div class="puzzle-box">
-            <strong>Light Code Challenge:</strong> The glowing sticks wall has sticks arranged in a pattern. A clue card shows which positions to read (e.g. "read positions 1, 4, 7, 10, 13"). The sticks at those positions each have a small number written on their base. Those numbers go into the decoder card (24–30) the kids have been carrying. The numbers spell:<br><br>
-            24 · 25 · 26 · 27 · 28 · 26 · 25 = G · R · I · M · O · I · R<br><br>
-            <em>This is not the codeword — it's a revelation moment. Kids realise they've been decoding the word GRIMOIR all along. The laptop prompts them to enter the full word.</em>
-            <div class="answer">✦ Answer / Codeword: GRIMOIR (the E is missing — to be found in the final station)</div>
-          </div>
-          <div class="souvenir-tag">🎁 Souvenir: A glowing bracelet or glow stick each</div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">After entering "GRIMOIR"</div>
-          <div class="screen-box">
-            "Jasper's dying message is decoded! He hid the Grimoire's name in the lights — knowing only the right person could unlock it. But the final letter is missing — E — and it can only be spoken by the one the Grimoire belongs to. The team that reaches the Final Chamber first wins the race. Then together — you name the killer. And then Meera finishes what Jasper started. Run!"
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- STATION A7 — FINAL -->
-    <div class="station">
-      <div class="station-header final">
-        <div class="station-num final">07</div>
-        <div class="station-info">
-          <h3>The Grimoire Chamber — Final Quest</h3>
-          <div class="station-meta">📍 Decorated final area · Both teams · Meera's special moment</div>
-        </div>
-      </div>
-      <div class="station-body">
-        <div class="finale-block">
-          <h3>⚡ The Final Revelation</h3>
-          <p>Both teams arrive and present their evidence on the laptop. Each team enters the name of their prime suspect. When both teams type <strong>THE ARCHIVIST</strong>, the laptop reveals the full accusation — the Silencing Draught, the torn Grimoire page, the signed ingredient receipt. The killer is named. Justice for Jasper.<br><br>
-          But the Grimoire is still missing. The screen reads:<br><br>
-          <em>"The killer has been unmasked. But the Grimoire was hidden before the Archivist could be stopped. Jasper left one final message — written for one person only. Only Meera can read it."</em><br><br>
-          The game master hands Meera a sealed envelope with her name on it. She opens it alone and reads aloud:</p>
-          <div class="incantation" style="font-style:italic; font-size:14px; letter-spacing:0.5px; line-height:2;">
-            "Dear Meera,<br>
-            I knew this day would come — so I hid the Grimoire somewhere only a true enchanter would think to look.<br><br>
-            The school runs on magic. Magic runs on movement. Find the wall where the wheels of wonder turn and interlock — but look for the one gear that is perfectly still. That is where I left it. It has been waiting for you.<br><br>
-            Happy Birthday, little one. The magic was always yours.<br>
-            — Jasper"
-          </div>
-          <p>Meera goes — with both teams watching and cheering — to the <strong>gear and cog wall</strong>. The Grimoire (a decorated notebook with her name on the cover) is hidden in the tray at the bottom among the loose gears. She finds it, holds it up, and everyone cheers.<br><br>
-          She brings it back and speaks the incantation aloud:</p>
-          <div class="incantation">
-            "By the light of my birthday star,<br>
-            and the magic that I am,<br>
-            I open this Grimoire for Jasper's sake —<br>
-            <strong>GRIMOIRE!</strong>"
-          </div>
-          <p>She opens the book. Inside: a "Jasper's Vision" card — his final recorded memory revealing the Archivist's face. Justice is complete. Then: Wizard Investigation Certificates for every player. The school's magic is restored. Jasper is avenged. Happy Birthday, Meera.</p>
-        </div>
-        <div style="margin-top:20px;">
-          <div class="souvenir-tag">🎁 Meera's Souvenir: Personalised Grimoire (small decorated notebook with her name on the cover)</div>
-          <div class="souvenir-tag" style="margin-top:8px;">🎁 Everyone's Souvenir: Wizard Certificate with their name, house, and the title "Investigator of Wyldmoor"</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="divider">✦ ✦ ✦</div>
-
-  <!-- ===================== SERPENT CIRCLE ===================== -->
-  <div class="section">
-    <div class="section-title">🔵 Serpent Circle — 7 Stations</div>
-    <div style="margin-bottom:24px;">
-      <span class="group-badge badge-serpent">Serpent Circle</span>
-      <span style="margin-left:12px; font-size:15px; color:rgba(245,237,216,0.6);">Starts at: Potions → Transfiguration → Divination → Astronomy → Herbology → Illumination → Final</span>
-    </div>
-
-    <!-- STATION B1 -->
-    <div class="station">
-      <div class="station-header serpent">
-        <div class="station-num serpent">01</div>
-        <div class="station-info">
-          <h3>Potions Dungeon</h3>
-          <div class="station-meta">📍 Ball pit · Suspect: Dr. Vex</div>
-        </div>
-      </div>
-      <div class="station-body">
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔵 Serpent Circle · Mission 1 of 7</div>
-            "Dr. Vex's Potions Dungeon is your first stop. The strange bubbling orb pool holds something important. Find the coloured potion balloons — but watch out for the red herring. Pop them, collect the letters, arrange them in colour order using your clue card."
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Balloon Pop (different set, same mechanic)</div>
-          <div class="puzzle-box">
-            <strong>Same balloon mechanic as Phoenix, different word:</strong> 5 real balloons + 1 red herring. Colour order on clue card: Yellow, Red, Purple, Green, Blue. Letters inside: <strong>F · L · A · M · E</strong><br><br>
-            Red herring balloon contains: X
-            <div class="answer">✦ Answer / Codeword: FLAME</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: A receipt from the Magical Ingredients Market — signed by The Archivist — for a Silencing Draught ingredient, purchased the day before Jasper was murdered. <em>(You can't silence someone without making the potion first. This is premeditated.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: Mini potion bottle</div>
-        </div>
-        <div class="block">
-          <div class="block-label">After entering "FLAME"</div>
-          <div class="screen-box">
-            "The Archivist bought Silencing Draught ingredients the day before the murder. That is not a coincidence. Jasper was silenced so he couldn't scream for help. The Archivist planned this. Move to: <strong>Transfiguration Hall.</strong>"
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATION B2 -->
-    <div class="station">
-      <div class="station-header serpent">
-        <div class="station-num serpent">02</div>
-        <div class="station-info">
-          <h3>Transfiguration Hall</h3>
-          <div class="station-meta">📍 Pretend play zone · Suspect: Sister Mox</div>
-        </div>
-      </div>
-      <div class="station-body">
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔵 Serpent Circle · Mission 2 of 7</div>
-            "Sister Mox was seen in the Transfiguration Hall — but which form was she wearing? The Hall has three rooms. A message is hidden here, but it can only be read in reverse. Find the mirror card and hold it up."
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Connect the Dots</div>
-          <div class="puzzle-box">
-            <strong>Connect the Dots:</strong> A printed sheet is hidden in the pretend play zone (e.g. under a car garage prop). It looks like a random star map — but when you connect the numbered dots in order (1 through 20), a shape appears. The shape is a KEY. Below the image, a riddle reads: "I open what is locked, I hide what is found. What am I?" Answer: KEY.<br><br>
-            The key shape also has 5 dots highlighted in gold: those dots have letters next to them. Highlighted letters: <strong>C · L · O · A · K</strong>
-            <div class="answer">✦ Answer / Codeword: CLOAK</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: Sister Mox's full rehearsal schedule — signed by thirty students — proving she performed a transformation show until midnight. She also left a note for Jasper asking him to check the Hall's props the next morning. <em>(She is completely cleared. She even liked Jasper.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: Fun disguise sticker or small "magic wand" pencil</div>
-        </div>
-        <div class="block">
-          <div class="block-label">After entering "CLOAK"</div>
-          <div class="screen-box">
-            "Sister Mox is completely cleared — and she actually left Jasper a friendly note. She couldn't have done this. Cross her off. The list is getting shorter. Move to: <strong>Divination Market.</strong>"
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATION B3 -->
-    <div class="station">
-      <div class="station-header serpent">
-        <div class="station-num serpent">03</div>
-        <div class="station-info">
-          <h3>Divination Market</h3>
-          <div class="station-meta">📍 Mini arcade + trampoline basketball · Suspect: The Archivist</div>
-        </div>
-      </div>
-      <div class="station-body">
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔵 Serpent Circle · Mission 3 of 7</div>
-            "The Archivist is known to haunt the Divination Market. They left something here — a coded message only a true detective can crack. Find the rubbing card, use your pencil, and reveal what's hidden."
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Pencil Rubbing Reveal</div>
-          <div class="puzzle-box">
-            <strong>Wax Rubbing:</strong> A card is prepared beforehand by writing a word in thick wax crayon, then painting over it with watercolour (the wax resists the paint and becomes visible). Kids are given the card and a pencil — they rub the pencil lightly over the card to reveal the wax impression underneath. (Alternative: emboss the word by pressing hard on the card above a textured surface — place thin paper over it and rub a pencil to reveal.)<br><br>
-            Hidden word revealed: <strong>ARCHIVE</strong>
-            <div class="answer">✦ Answer / Codeword: ARCHIVE</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: A torn page from the Grimoire's index — the page listing the forbidden chapter about erased identities. It has dusty fingerprints all over it, and in the corner, written in tiny letters: <em>"Finally. It is mine."</em> <em>(The Archivist was looking for their own erased name. This is the motive and the murder weapon in one.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: Fortune card with a silly prediction</div>
-        </div>
-        <div class="block">
-          <div class="block-label">After entering "ARCHIVE"</div>
-          <div class="screen-box">
-            "The torn page and the handwriting seal it. The Archivist erased their own name from the world years ago — and the Grimoire was the only book that still remembered it. Jasper stood in the way. Now you know everything. Move to: <strong>Astronomy Tower.</strong>"
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATION B4 -->
-    <div class="station">
-      <div class="station-header serpent">
-        <div class="station-num serpent">04</div>
-        <div class="station-info">
-          <h3>Astronomy Tower</h3>
-          <div class="station-meta">📍 Climbing maze with slides · Suspect: Prof. Orion Dusk</div>
-        </div>
-      </div>
-      <div class="station-body">
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔵 Serpent Circle · Mission 4 of 7</div>
-            "Prof. Orion was seen high in the Astronomy Tower the night of the theft. But was he really stargazing — or searching for something? Climb up and find the hidden constellation puzzle. The stars will tell you the truth."
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Riddle in Verse</div>
-          <div class="puzzle-box">
-            <strong>Riddle Scroll:</strong> A scroll is hidden near the top of the climbing structure (game master places it the night before, tied to a bridge railing). The scroll contains a rhyming riddle:<br><br>
-            <em>"I have a tail but I'm not a cat,<br>
-            I fly at night but I'm not a bat,<br>
-            I light the sky but I'm not the sun,<br>
-            I streak and fade when my race is run.<br>
-            What am I?"</em><br><br>
-            Answer: A shooting STAR. The codeword is the last word of the scroll: <strong>"When you find the truth, look for the STAR."</strong>
-            <div class="answer">✦ Answer / Codeword: STAR</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: Prof. Orion's telescope log — timestamped entries every fifteen minutes through the entire night, tracking Comet Mira. The Royal Observatory has already verified the data matches. <em>(He is completely cleared. He never left his telescope.)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: Mini star map scroll</div>
-        </div>
-        <div class="block">
-          <div class="block-label">After entering "STAR"</div>
-          <div class="screen-box">
-            "Professor Orion is cleared. He was watching a comet — not committing a murder. He's actually devastated about Jasper. Cross him off. Only one suspect remains. Move to: <strong>Herbology Grounds.</strong>"
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATION B5 -->
-    <div class="station">
-      <div class="station-header serpent">
-        <div class="station-num serpent">05</div>
-        <div class="station-info">
-          <h3>Herbology Grounds</h3>
-          <div class="station-meta">📍 Sand pit · Suspect: Madame Briar</div>
-        </div>
-      </div>
-      <div class="station-body">
-        <div class="block">
-          <div class="block-label">Laptop Screen</div>
-          <div class="screen-box">
-            <div class="screen-title">🔵 Serpent Circle · Mission 5 of 7</div>
-            "Madame Briar keeps all her secrets in the sand. Something is buried in her Herbology Grounds that she doesn't want you to find. Dig carefully — and arrange what you find in the right order."
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-label">Physical Puzzle — Buried Scrambled Tiles (different word)</div>
-          <div class="puzzle-box">
-            <strong>Dig and Unscramble:</strong> 6 tiles buried in the sand. Each has a letter and a number (1–6). Sort by number to reveal the word.<br><br>
-            Letters in order: <strong>G · R · O · W · T · H</strong>
-            <div class="answer">✦ Answer / Codeword: GROWTH</div>
-          </div>
-          <div class="evidence-tag">🔍 Evidence found: Madame Briar's greenhouse diary — she was up all night worried about her Moonbloom, and wrote an entry at 2am about hearing strange footsteps in the corridor above. She even drew a small sketch of the sound direction — pointing straight toward the Grimoire vault. <em>(She is cleared — and she's actually a witness!)</em></div>
-          <div class="souvenir-tag">🎁 Souvenir: Seed packet with a magical plant drawing</div>
-        </div>
-        <div class="block">
-          <div class="block-label">After entering "GROWTH"</div>
-          <div class="screen-box">
-            "Madame Briar is cleared — and her diary places the footsteps directly at the vault at midnight. She heard the killer. Every other suspect now has an alibi. Only one name remains. Head to <strong>The Illumination Chamber</strong> — the Phoenix Order will be there. Together, you finish this."
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATION B6 — SHARED (same as A6) -->
-    <div class="station">
-      <div class="station-header shared">
-        <div class="station-num shared">06</div>
-        <div class="station-info">
-          <h3>The Illumination Chamber</h3>
-          <div class="station-meta">📍 Glowing sticks wall · Both teams arrive here · Shared challenge — race!</div>
-        </div>
-      </div>
-      <div class="station-body">
-        <div class="block">
-          <div class="block-label">Same challenge as Phoenix Order — race to finish first</div>
-          <div class="puzzle-box">
-            Both teams do the glowing sticks decoder simultaneously. The team that enters GRIMOIR on their laptop first wins the race trophy. Both teams then proceed to the Final Chamber together.
-            <div class="answer">✦ Answer / Codeword: GRIMOIR</div>
-          </div>
-          <div class="souvenir-tag">🎁 Souvenir: Glow bracelet or glow stick</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATION B7 — FINAL (same) -->
-    <div class="station">
-      <div class="station-header final">
-        <div class="station-num final">07</div>
-        <div class="station-info">
-          <h3>The Grimoire Chamber — Final Quest</h3>
-          <div class="station-meta">📍 Decorated final area · Same as Phoenix Station 7</div>
-        </div>
-      </div>
-      <div class="station-body">
-        <div class="block">
-          <div class="block-label">Laptop — Both Teams Submit Their Suspect</div>
-          <div class="screen-box">
-            <div class="screen-title">⚡ Final Accusation</div>
-            Both teams type their prime suspect. The laptop (game master controlled) accepts the answer when both type: THE ARCHIVIST. A dramatic reveal plays — the Silencing Draught, the torn Grimoire page, the signed receipt. The screen shows: <em>"Jasper is avenged."</em> Then: Meera receives her sealed envelope from Jasper, reads the clue aloud, goes to the gear wall, finds the Grimoire herself, returns, speaks the incantation, opens the book. Certificates for everyone. 🎉
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="divider">✦ ✦ ✦</div>
-
-  <!-- GAME MASTER NOTES -->
-  <div class="section">
-    <div class="section-title">Game Master Notes</div>
-    <div class="story-scroll" style="font-style:normal; font-size:16px; line-height:1.85;">
-      <strong>Setup (day before):</strong><br>
-      · Prepare all letter tiles, bury sand pit tiles in small ziplock bags<br>
-      · Inflate and tie balloons, tape to ball pit walls at different heights<br>
-      · Prepare mirror writing cards, wax rubbing cards, word search sheets<br>
-      · Roll and tie star scrolls, hide on climbing structure<br>
-      · Prepare the glowing sticks wall pattern (mark which sticks to check)<br>
-      · Prepare the final box: does not exist anymore — instead, hide Meera's Grimoire notebook (decorated, her name on the cover) in the gear wall tray among the loose gears. Place it the morning of the party.<br>
-      · Prepare a sealed envelope addressed to "Meera" containing Jasper's final letter (printed on aged/parchment paper) — give this to the game master to hand over at the finale<br>
-      · Prepare a "Jasper's Vision" card to tuck inside the Grimoire notebook itself — Meera finds it when she opens the book<br>
-      · Print decoder cards (24–30) — one per player<br>
-      · Print clue order cards and evidence cards for each station<br><br>
-      <strong>Teams:</strong> Phoenix Order wears red wristbands. Serpent Circle wears blue wristbands.<br><br>
-      <strong>Laptop setup:</strong> Two identical laptops, one per team. Use a simple Google Form or Notion page where each correct codeword reveals the next clue. Or use printed "unlock envelopes" — entering the correct word allows the game master to hand over the next envelope.<br><br>
-      <strong>Timing:</strong> Allow 5–7 minutes per station. Total game time approx. 55–65 minutes.<br><br>
-      <strong>The race winner:</strong> The team that enters GRIMOIR at the Illumination Chamber first gets a "House Cup" trophy or ribbon before the final collaborative scene.<br><br>
-      <strong>The accusation:</strong> Both teams must independently arrive at THE ARCHIVIST. Phoenix finds the Silencing Draught vial. Serpent finds the ingredient receipt and the torn Grimoire page. Neither team has the full picture alone — which makes the combination moment feel genuinely earned.<br><br>
-      <strong>Meera's moment:</strong> Hand her the sealed envelope — let her read Jasper's letter aloud to everyone. Then step back and let her go find the Grimoire herself at the gear wall. Have both teams follow at a distance, cheering. When she pulls it out of the tray, that is the money shot — torch on her if possible. She walks back, speaks the incantation, opens the book, finds Jasper's Vision card inside. That is the birthday magic moment — protect it completely.
-    </div>
-  </div>
-
-  <div style="text-align:center; padding:40px 0; opacity:0.3; font-family:'Cinzel',serif; font-size:12px; letter-spacing:3px;">
-    WYLDMOOR SCHOOL OF ENCHANTMENT · CASE FILE: THE GRIMOIRE MYSTERY · FOR MEERA
-  </div>
-
 </div>
+
+<!-- ===== SCREEN CONTENT ===== -->
+<div id="screen" class="no-progress-bar"></div>
+
+<script>
+// ===== GAME STATE =====
+const state = {
+  currentStation: 0,
+  timerRunning: false,
+  timeRemaining: 300,
+  timerInterval: null,
+  isPaused: false,
+  finaleStep: 0
+};
+
+// =====================================================================
+// STATION DATA — PHOENIX ORDER
+// Edit text content here. Each object = one station.
+// =====================================================================
+const stations = [
+
+  // ---- STATION 1: Astronomy Tower ----
+  {
+    id: 1,
+    name: 'Station 1 · Astronomy Tower',
+    suspect: '🔭 Suspect: Prof. Orion Dusk',
+    cleared: false,
+    codeword: 'NIGHT',
+    briefing: 'Detectives — Professor Orion Dusk was seen climbing very high the night the Grimoire vanished. Perhaps he left something behind up there. Search the Astronomy Tower — the tall climbing structure — and find the sealed scroll hidden among the bridges. When you crack it, bring back the codeword.',
+    puzzle: 'The scroll contains 5 star-shaped cards hidden along the climbing bridges. Each card has one letter on the back and a number (1–5) on the front. Find all 5 cards. Arrange them in order of their numbers. Read the letters in order to find the codeword.',
+    evidenceTitle: '🔍 Evidence Found at the Astronomy Tower',
+    evidenceText: "Professor Orion's star map — with the Grimoire vault corridor circled in red ink, and a note that reads: 'Jasper patrols at midnight.' He knew exactly when the caretaker would be alone. Very suspicious.",
+    souvenir: '🎁 Souvenir: Mini star map scroll',
+    critical: false
+  },
+
+  // ---- STATION 2: Herbology Grounds ----
+  {
+    id: 2,
+    name: 'Station 2 · Herbology Grounds',
+    suspect: '🌿 Suspect: Madame Briar',
+    cleared: false,
+    codeword: 'PETALS',
+    briefing: 'Madame Briar tends her magical plants in the Herbology Grounds — a sandy, earthy place. She was seen digging late at night. Something is buried there. Find it.',
+    puzzle: 'Six letter tiles are buried in the sand pit, each sealed in a small bag. Each tile has a letter on one side and a number (1–6) on the other. Dig them all out. Sort them by number. Read the letters in order to find the codeword.',
+    evidenceTitle: '🔍 Evidence Found at the Herbology Grounds',
+    evidenceText: "A gardening glove with a purple stain — the same colour as Grimoire ink. In the pocket: a crumpled note that reads: 'Jasper knows. I have until morning.' Madame Briar was panicking the night of the murder.",
+    souvenir: '🎁 Souvenir: Small paper seed packet with a magical plant drawing',
+    critical: false
+  },
+
+  // ---- STATION 3: Potions Dungeon ----
+  {
+    id: 3,
+    name: 'Station 3 · Potions Dungeon',
+    suspect: '🧪 Suspect: Dr. Vex',
+    cleared: true,
+    codeword: 'SHADOW',
+    briefing: "Dr. Vex's Potions Dungeon is a bubbling, chaotic place — full of floating orbs and strange ingredients. He claims he was in his lab all night. But something is hidden in the orb pool. Find the coloured potion balloons — the clue is inside.",
+    puzzle: 'Find the balloons taped around the ball pit. There are 6 — but one is a red herring. Use your colour order clue card (Red, Blue, Green, Yellow, Purple) to know which balloons are real. Pop them in colour order, collect the letter from each, and read the codeword.',
+    evidenceTitle: '🔍 Evidence Found at the Potions Dungeon',
+    evidenceText: "Dr. Vex's enchanted teapot-cat was with him all night, brewing a reversal potion. The teapot rattled three times — YES — he never left the dungeon. Dr. Vex is CLEARED. But the teapot also heard footsteps in the corridor above at exactly midnight. Someone was near the vault.",
+    souvenir: '🎁 Souvenir: Mini potion bottle',
+    critical: false
+  },
+
+  // ---- STATION 4: Transfiguration Hall ----
+  {
+    id: 4,
+    name: 'Station 4 · Transfiguration Hall',
+    suspect: '🎭 Suspect: Sister Mox',
+    cleared: true,
+    codeword: 'MIRROR',
+    briefing: 'Sister Mox can transform into anything — a broom, a cat, a jar of jam. She was spotted in the Transfiguration Hall the night of the theft. A message is hidden here, but it can only be read in reverse. Find the mirror card and hold it up to the small mirror at the station.',
+    puzzle: 'Find the card hidden in one of the three pretend play rooms. It is written in mirror writing — backwards. Hold it up to the small mirror provided. Read what it says. Follow its instructions to find the codeword.',
+    evidenceTitle: '🔍 Evidence Found at the Transfiguration Hall',
+    evidenceText: 'A disguise kit — wigs, a dark cloak, and a face mask — hidden behind the salon mirrors. But Sister Mox has a rock-solid alibi: a student performance rehearsal schedule, signed by thirty witnesses, running until midnight. Sister Mox is CLEARED.',
+    souvenir: '🎁 Souvenir: Disguise sticker sheet',
+    critical: false
+  },
+
+  // ---- STATION 5: Divination Market ----
+  {
+    id: 5,
+    name: 'Station 5 · Divination Market',
+    suspect: '📜 Suspect: The Archivist',
+    cleared: false,
+    codeword: 'SIGN',
+    briefing: 'The Archivist haunts the Divination Market — a place where futures are sold like fruit. They know things nobody else knows. Find the word search they left behind. The hidden words will reveal their secret.',
+    puzzle: 'Find the word search sheet at the Divination Market station. Locate these five hidden words: STOLEN · INK · GLOVE · NIGHT. Read the first letter of each word, in that exact order. Those four letters spell the codeword.',
+    evidenceTitle: '🔍 KEY EVIDENCE Found at the Divination Market — ⚡ CRITICAL',
+    evidenceText: "A pair of ink-stained gloves — small and delicate, smelling of old parchment and dust. Exactly the kind worn by someone who handles ancient books all day. Tucked inside one glove: a tiny vial, empty, labelled 'Silencing Draught.' This is the spell used on Jasper. This vial belongs to The Archivist. This is the murder weapon.",
+    souvenir: '🎁 Souvenir: Fortune card with a personalised prediction',
+    critical: true
+  },
+
+  // ---- STATION 6: Illumination Chamber (SHARED) ----
+  {
+    id: 6,
+    name: 'Station 6 · The Illumination Chamber · ⚡ BOTH HOUSES',
+    suspect: null,
+    cleared: false,
+    codeword: 'GRIMOIR',
+    isShared: true,
+    briefing: 'Both houses have arrived at the Illumination Chamber — the school\'s magical communication wall. Before he was killed, Jasper hid one final message here in the light. Work within your own team. THE RACE IS ON. The house that finishes first moves to the Final Chamber first — and gets to name the killer.',
+    puzzle: 'Look at the glowing sticks wall. Your game master will show you which positions to check. Each marked stick has a small number on its base. Use your decoder card (the one you\'ve been carrying since the start) to convert each number to a letter. Read the letters in order. You have been decoding this word all along. What word does it spell? Enter it below — but note: one letter is still missing.',
+    evidenceTitle: '⚡ Jasper\'s Dying Message Decoded',
+    evidenceText: "Jasper hid the Grimoire's name in the lights — knowing only the right person could unlock it. But the final letter is missing — E — and it can only be spoken by the one the Grimoire belongs to: Meera.\n\nThe team that reaches the Final Chamber first wins the race. Then together — you name the killer. Then Meera finishes what Jasper started.",
+    souvenir: null,
+    critical: false,
+    showDecoder: true,
+    manualAdvance: true
+  },
+
+  // ---- STATION 7: Finale ----
+  { id: 7, isFinale: true }
+];
+
+// ===== TIMER =====
+function startTimer() {
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  state.timerRunning = true;
+  state.isPaused = false;
+  state.timerInterval = setInterval(tickTimer, 1000);
+  renderTimer();
+}
+function tickTimer() {
+  if (state.timeRemaining > 0) { state.timeRemaining--; }
+  renderTimer();
+  if (state.timeRemaining === 0) { clearInterval(state.timerInterval); state.timerRunning = false; }
+}
+function stopTimer() {
+  clearInterval(state.timerInterval);
+  state.timerRunning = false;
+}
+function resetTimer() {
+  stopTimer();
+  state.timeRemaining = 300;
+  state.isPaused = false;
+  const btn = document.getElementById('pauseBtn');
+  if (btn) btn.textContent = 'PAUSE';
+  renderTimer();
+}
+function renderTimer() {
+  const el = document.getElementById('timer');
+  if (!el) return;
+  const m = Math.floor(state.timeRemaining / 60);
+  const s = state.timeRemaining % 60;
+  el.textContent = `${m}:${String(s).padStart(2, '0')}`;
+  el.className = 'timer';
+  if (state.timeRemaining === 0) el.classList.add('zero');
+  else if (state.timeRemaining < 60) el.classList.add('warning');
+}
+function togglePause() {
+  const btn = document.getElementById('pauseBtn');
+  if (state.isPaused) {
+    state.isPaused = false;
+    startTimer();
+    if (btn) btn.textContent = 'PAUSE';
+  } else {
+    state.isPaused = true;
+    stopTimer();
+    if (btn) btn.textContent = 'RESUME';
+  }
+}
+
+// ===== PROGRESS BAR =====
+function updateProgress(stationId) {
+  const wrap = document.getElementById('progressWrap');
+  const fill = document.getElementById('progressFill');
+  const dots = document.getElementById('progressDots');
+  if (stationId === 0) { wrap.classList.add('hidden'); return; }
+  wrap.classList.remove('hidden');
+  const pct = ((stationId - 1) / 6) * 100;
+  fill.style.width = pct + '%';
+  dots.innerHTML = '';
+  for (let i = 1; i <= 7; i++) {
+    const d = document.createElement('div');
+    d.className = 'pdot' + (i < stationId ? ' done' : i === stationId ? ' cur' : '');
+    d.textContent = i;
+    dots.appendChild(d);
+  }
+}
+
+// ===== TRANSITION =====
+function transition(fn) {
+  const sc = document.getElementById('screen');
+  sc.classList.add('fading');
+  setTimeout(() => { fn(); sc.classList.remove('fading'); }, 420);
+}
+
+// ===== STARS =====
+function makeStars() {
+  const c = document.getElementById('starsContainer');
+  for (let i = 0; i < 52; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.4 + 0.6;
+    const dur = (Math.random() * 4 + 1.8).toFixed(1);
+    const delay = (Math.random() * 5).toFixed(1);
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${dur}s;--delay:${delay}s;animation-delay:${delay}s;opacity:${(Math.random()*0.5+0.2).toFixed(2)}`;
+    c.appendChild(s);
+  }
+}
+
+// ===== OPENING SCREEN =====
+function showOpening() {
+  state.currentStation = 0;
+  updateProgress(0);
+  const sc = document.getElementById('screen');
+  sc.className = 'no-progress-bar';
+  document.getElementById('mainHeader').className = 'header';
+  document.getElementById('hdrStation').className = 'hdr-station';
+  document.getElementById('hdrStation').textContent = 'The Grimoire Mystery';
+  document.getElementById('timer').textContent = '5:00';
+  document.getElementById('pauseBtn').classList.add('hidden');
+  sc.innerHTML = `
+    <div class="open-screen">
+      <div class="crest">✦</div>
+      <h1 class="main-title">THE GRIMOIRE MYSTERY</h1>
+      <p class="main-subtitle"><em>Meera's 9th Birthday · A Magical Murder Mystery</em></p>
+      <div class="divider">✦ ✦ ✦</div>
+      <div class="story-scroll">
+        <p>Welcome, young witches, to the Wyldmoor School of Enchantment.</p>
+        <p>Today should have been the most magical day of the year — the birthday of our most gifted student, Meera. But something terrible has happened.</p>
+        <p>This morning, at the stroke of dawn, Jasper — the school's beloved caretaker, who had looked after Wyldmoor for forty years — was found dead. He was lying in the corridor outside the Grimoire vault. The vault door was open. And the Ancient Grimoire of Wonders — the most powerful book in existence — was gone.</p>
+        <p>Jasper was the only one who knew the vault's secret password. Which means whoever killed him... made him talk first.</p>
+        <p>The school is in shock. The teachers are too frightened to investigate — because the killer is still inside these walls. It has to be one of the five people who were in the school last night.</p>
+        <p>That is why you are here.</p>
+        <p>You are the PHOENIX ORDER. You will search the northern wings.<br>Gather your evidence. Crack every seal. Find the killer.</p>
+        <p>Five suspects. One killer. Jasper is counting on you.</p>
+        <p>Your investigation begins now.</p>
+      </div>
+      <button class="begin-btn" onclick="beginGame()">BEGIN INVESTIGATION →</button>
+    </div>`;
+}
+
+// ===== BEGIN GAME =====
+function beginGame() {
+  transition(() => {
+    document.getElementById('pauseBtn').classList.remove('hidden');
+    showStation(0);
+    resetTimer();
+    startTimer();
+  });
+}
+
+// ===== SHOW STATION =====
+function showStation(idx) {
+  const s = stations[idx];
+  state.currentStation = s.id;
+  updateProgress(s.id);
+  const sc = document.getElementById('screen');
+  sc.className = '';
+  const hdr = document.getElementById('mainHeader');
+  const hdrSt = document.getElementById('hdrStation');
+
+  if (s.isShared) {
+    hdr.className = 'header purple-mode';
+    hdrSt.className = 'hdr-station purple-mode';
+    hdrSt.textContent = s.name;
+  } else if (s.isFinale) {
+    hdr.className = 'header';
+    hdrSt.className = 'hdr-station';
+    hdrSt.textContent = '⚡ The Grimoire Chamber · Final Quest';
+    showFinale();
+    return;
+  } else {
+    hdr.className = 'header';
+    hdrSt.className = 'hdr-station';
+    hdrSt.textContent = s.name;
+  }
+
+  // Suspect badge HTML
+  let badgeHtml = '';
+  if (s.suspect) {
+    const clearedHtml = s.cleared ? '<span class="cleared-badge">✓ CLEARED</span>' : '';
+    badgeHtml = `<div class="suspect-badge">${s.suspect}${clearedHtml}</div>`;
+  } else if (s.isShared) {
+    badgeHtml = `<div class="suspect-badge" style="border-color:rgba(108,61,138,0.5);color:#c5b0e8;background:rgba(108,61,138,0.08);">⚡ BOTH HOUSES COMPETE</div>`;
+  }
+
+  // Decoder table for station 6
+  let decoderHtml = '';
+  if (s.showDecoder) {
+    const entries = [{n:24,l:'G'},{n:25,l:'R'},{n:26,l:'I'},{n:27,l:'M'},{n:28,l:'O'},{n:29,l:'I'},{n:30,l:'R'}];
+    decoderHtml = '<div class="decoder-grid">' + entries.map(e=>`<div class="dc-cell"><span class="dc-num">${e.n}</span><span class="dc-letter">${e.l}</span></div>`).join('') + '</div>';
+  }
+
+  // Advance button (station 6 only — inside evidence box)
+  const advHtml = s.manualAdvance
+    ? `<button class="advance-btn hidden" id="advBtn" onclick="nextStation(${idx})">→ ADVANCE TO FINAL CHAMBER</button>`
+    : '';
+
+  sc.innerHTML = `
+    <div class="station-screen">
+      ${badgeHtml}
+      <div class="briefing-box">
+        <div class="box-label">Mission Briefing</div>
+        <p>${s.briefing}</p>
+      </div>
+      <div class="puzzle-box">
+        <div class="box-label">Puzzle Instructions</div>
+        <p>${s.puzzle}</p>
+        ${decoderHtml}
+      </div>
+      <div class="evidence-box ${s.critical ? 'critical' : ''}" id="evidenceBox">
+        <div class="box-label">${s.evidenceTitle}</div>
+        <p>${s.evidenceText.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>
+        ${s.souvenir ? `<div class="souvenir-tag">${s.souvenir}</div>` : ''}
+        ${advHtml}
+      </div>
+      <div class="codeword-section">
+        <div class="codeword-label">Enter the Codeword</div>
+        <div class="codeword-row">
+          <input class="codeword-input" id="cwInput" type="text" autocomplete="off" autocorrect="off" spellcheck="false"
+            placeholder="— — — — —"
+            onkeydown="if(event.key==='Enter')checkCW(${idx})">
+          <button class="submit-btn" id="submitBtn" onclick="checkCW(${idx})">SUBMIT</button>
+        </div>
+        <div class="feedback-msg" id="feedMsg"></div>
+      </div>
+    </div>`;
+
+  setTimeout(() => { const i = document.getElementById('cwInput'); if(i) i.focus(); }, 80);
+}
+
+// ===== CHECK CODEWORD =====
+function checkCW(idx) {
+  const input = document.getElementById('cwInput');
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('feedMsg');
+  if (!input || input.disabled) return;
+
+  const entered = input.value.trim().toUpperCase();
+  const correct = stations[idx].codeword.toUpperCase();
+
+  if (entered === correct) {
+    // --- CORRECT ---
+    input.classList.add('success');
+    input.disabled = true;
+    if (btn) btn.disabled = true;
+    msg.className = 'feedback-msg ok';
+    msg.textContent = '✦ Correct! The seal is broken...';
+    stopTimer();
+
+    setTimeout(() => {
+      const eb = document.getElementById('evidenceBox');
+      if (eb) eb.classList.add('revealed');
+      const adv = document.getElementById('advBtn');
+      if (adv) adv.classList.remove('hidden');
+
+      if (!stations[idx].manualAdvance) {
+        msg.textContent = '✦ Evidence revealed! Moving to next station...';
+        setTimeout(() => nextStation(idx), 3200);
+      } else {
+        msg.textContent = '✦ Evidence revealed! Advance when ready.';
+      }
+    }, 900);
+
+  } else {
+    // --- WRONG ---
+    input.classList.add('error');
+    msg.className = 'feedback-msg err';
+    msg.textContent = 'The magic did not respond. Try again.';
+    setTimeout(() => {
+      input.classList.remove('error');
+      input.value = '';
+      input.focus();
+    }, 550);
+    setTimeout(() => { msg.textContent = ''; }, 2100);
+  }
+}
+
+// ===== NEXT STATION =====
+function nextStation(idx) {
+  const next = idx + 1;
+  if (next >= stations.length) return;
+  transition(() => {
+    resetTimer();
+    showStation(next);
+    if (!stations[next].isFinale) startTimer();
+  });
+}
+
+// =====================================================================
+// FINALE SYSTEM — 6 steps
+// =====================================================================
+function showFinale() {
+  stopTimer();
+  document.getElementById('timer').textContent = '';
+  document.getElementById('pauseBtn').classList.add('hidden');
+  state.finaleStep = 1;
+  renderFinaleStep(1);
+}
+
+function goFinaleStep(n) {
+  transition(() => renderFinaleStep(n));
+}
+
+function renderFinaleStep(step) {
+  state.finaleStep = step;
+  const sc = document.getElementById('screen');
+
+  if (step === 1) {
+    // --- STEP 1: THE ACCUSATION ---
+    sc.innerHTML = `
+      <div class="finale-screen">
+        <div class="step-label">Step 1 of 6 — The Accusation</div>
+        <h2 class="finale-heading">Present Your Evidence</h2>
+        <p class="text-parchment text-italic">You have gathered the clues. The Silencing Draught vial. The star map. The ink-stained gloves. Every suspect has been investigated. Every alibi has been checked. Only one name remains.</p>
+        <div class="suspect-list">
+          <div class="suspect-row"><span>🔭 Professor Orion Dusk</span><span class="status-cleared">✓ CLEARED</span></div>
+          <div class="suspect-row"><span>🌿 Madame Briar</span><span class="status-cleared">✓ CLEARED</span></div>
+          <div class="suspect-row"><span>🧪 Dr. Vex</span><span class="status-cleared">✓ CLEARED</span></div>
+          <div class="suspect-row"><span>🎭 Sister Mox</span><span class="status-cleared">✓ CLEARED</span></div>
+          <div class="suspect-row"><span>📜 The Archivist</span><span class="status-unknown">?</span></div>
+        </div>
+        <div class="accuse-wrap">
+          <div class="codeword-label">Name the killer:</div>
+          <input class="accuse-input" id="accuseInput" type="text" autocomplete="off" placeholder="The Archivist"
+            onkeydown="if(event.key==='Enter')submitAccuse()">
+          <button class="accuse-btn" onclick="submitAccuse()">⚡ ACCUSE</button>
+          <div class="feedback-msg" id="accuseMsg"></div>
+        </div>
+      </div>`;
+    setTimeout(() => { const i = document.getElementById('accuseInput'); if(i) i.focus(); }, 80);
+
+  } else if (step === 2) {
+    // --- STEP 2: THE REVEAL ---
+    sc.innerHTML = `
+      <div class="finale-screen reveal-bg">
+        <div class="step-label">Step 2 of 6 — The Reveal</div>
+        <h2 class="finale-heading" style="font-size:34px;text-shadow:0 0 30px rgba(201,168,76,0.4);">⚡ THE ARCHIVIST IS THE KILLER</h2>
+        <div class="evidence-cards">
+          <div class="ev-card">
+            <span class="ev-card-label">PHOENIX FINDS</span>
+            <p>🔍 <em>The Silencing Draught</em> — A vial found in The Archivist's ink-stained gloves at the Divination Market. Jasper could not scream for help. He was silenced first.</p>
+          </div>
+          <div class="ev-card">
+            <span class="ev-card-label">SERPENT FINDS</span>
+            <p>📜 <em>The Torn Grimoire Page</em> — A page from the Grimoire's forbidden chapter, covered in The Archivist's fingerprints, with the words 'Finally. It is mine.' written in the corner.</p>
+          </div>
+          <div class="ev-card">
+            <span class="ev-card-label">SERPENT FINDS</span>
+            <p>🧾 <em>The Ingredient Receipt</em> — Signed by The Archivist. Purchased Silencing Draught ingredients the day before the murder. Premeditated. Planned.</p>
+          </div>
+        </div>
+        <div class="motive-box">
+          <p>The Archivist erased their own name from the world years ago — a banished dark enchanter hiding in plain sight. The Grimoire's forbidden pages contained their true identity — the only record left in existence. Jasper was the last one standing between them and that secret. So they silenced him. Forever.</p>
+          <p class="justice">Justice for Jasper.</p>
+        </div>
+        <button class="continue-btn" onclick="goFinaleStep(3)">Continue →</button>
+      </div>`;
+
+  } else if (step === 3) {
+    // --- STEP 3: MEERA'S MOMENT ---
+    sc.innerHTML = `
+      <div class="finale-screen">
+        <div class="step-label">Step 3 of 6 — Meera's Moment</div>
+        <h2 class="finale-heading">The Grimoire Awaits Its True Owner</h2>
+        <p class="text-parchment-large text-italic">The killer has been unmasked. But the Grimoire was hidden before The Archivist could be stopped. Jasper left one final message — written for one person only.</p>
+        <div class="envelope">
+          <div class="env-icon">✉</div>
+          <div class="env-label">For Meera</div>
+        </div>
+        <p class="text-parchment text-italic">The Game Master will now hand Meera her sealed envelope from Jasper.<br>Meera — please read it aloud to everyone.</p>
+        <button class="continue-btn" onclick="goFinaleStep(4)">Meera has read the letter →</button>
+      </div>`;
+
+  } else if (step === 4) {
+    // --- STEP 4: JASPER'S LETTER ---
+    sc.innerHTML = `
+      <div class="finale-screen">
+        <div class="step-label">Step 4 of 6 — Jasper's Letter</div>
+        <h2 class="finale-heading" style="font-size:22px;">A Letter From Jasper</h2>
+        <div class="parchment-letter">
+          <p>Dear Meera,</p>
+          <p>I knew this day would come — so I hid the Grimoire somewhere only a true enchanter would think to look.</p>
+          <p>The school runs on magic. Magic runs on movement. Find the wall where the wheels of wonder turn and interlock — but look for the one gear that is perfectly still. That is where I left it. It has been waiting for you.</p>
+          <p>Happy Birthday, little one. The magic was always yours.</p>
+          <p style="margin-top:16px;">— Jasper</p>
+        </div>
+        <p class="gold-note">Meera — go find the Grimoire at the gear and cog wall.<br><span style="font-family:'Crimson Text',serif;font-size:15px;color:var(--parchment-muted);letter-spacing:0;">Both houses will follow and cheer.</span></p>
+        <button class="continue-btn" onclick="goFinaleStep(5)">Meera has found the Grimoire! →</button>
+      </div>`;
+
+  } else if (step === 5) {
+    // --- STEP 5: THE INCANTATION ---
+    sc.innerHTML = `
+      <div class="finale-screen">
+        <div class="step-label">Step 5 of 6 — The Incantation</div>
+        <h2 class="finale-heading">Speak the Incantation, Meera</h2>
+        <div class="incantation-box">
+          <p>By the light of my birthday star,</p>
+          <p>and the magic that I am,</p>
+          <p>I open this Grimoire for Jasper's sake —</p>
+          <p class="incant-big">GRIMOIRE!</p>
+        </div>
+        <p class="text-parchment text-italic">Meera — say these words aloud. Then open the book.</p>
+        <button class="continue-btn" onclick="goFinaleStep(6)">The Grimoire is open! →</button>
+      </div>`;
+
+  } else if (step === 6) {
+    // --- STEP 6: CELEBRATION ---
+    document.querySelectorAll('.star').forEach(s => s.classList.add('celebrate'));
+    sc.innerHTML = `
+      <div class="finale-screen" style="gap:24px;">
+        <div class="step-label">Step 6 of 6 — Celebration</div>
+        <h1 class="celebration-title">✦ Happy Birthday, Meera! ✦</h1>
+        <p class="text-parchment-large text-italic">Jasper is avenged. The school's magic is restored.</p>
+        <div class="cert-badges">
+          <div class="cert-badge">
+            <div class="cert-title">🔴 PHOENIX ORDER</div>
+            <div class="cert-body"><em>Wizard Investigators of Wyldmoor</em><br>You solved The Grimoire Mystery<br><br>Stations visited:<br>Astronomy Tower · Herbology Grounds<br>Potions Dungeon · Transfiguration Hall<br>Divination Market · Illumination Chamber<br>The Grimoire Chamber</div>
+          </div>
+          <div class="cert-badge">
+            <div class="cert-title">🔵 SERPENT CIRCLE</div>
+            <div class="cert-body"><em>Wizard Investigators of Wyldmoor</em><br>You solved The Grimoire Mystery<br><br>Stations visited:<br>Potions Dungeon · Transfiguration Hall<br>Divination Market · Astronomy Tower<br>Herbology Grounds · Illumination Chamber<br>The Grimoire Chamber</div>
+          </div>
+        </div>
+        <div style="text-align:center;max-width:580px;">
+          <p style="font-family:'Crimson Text',serif;font-style:italic;font-size:18px;color:var(--parchment);line-height:1.95;">
+            Jasper watched over Wyldmoor for forty years. Today, you gave him justice.<br>
+            The Grimoire is home. The magic lives on.<br>
+            <strong style="font-family:'Cinzel',serif;color:var(--gold);font-size:19px;letter-spacing:3px;">Well done, detectives. Well done.</strong>
+          </p>
+        </div>
+      </div>`;
+  }
+}
+
+// ===== SUBMIT ACCUSATION =====
+function submitAccuse() {
+  const input = document.getElementById('accuseInput');
+  const msg = document.getElementById('accuseMsg');
+  if (!input || input.disabled) return;
+  const val = input.value.trim().toUpperCase().replace(/\s+/g,' ');
+  if (val === 'THE ARCHIVIST' || val === 'ARCHIVIST') {
+    input.disabled = true;
+    msg.className = 'feedback-msg ok';
+    msg.textContent = '⚡ The evidence is undeniable...';
+    setTimeout(() => goFinaleStep(2), 1200);
+  } else {
+    input.classList.add('error');
+    msg.className = 'feedback-msg err';
+    msg.textContent = 'The evidence does not support this accusation. Review your clues.';
+    setTimeout(() => { input.classList.remove('error'); input.value = ''; input.focus(); }, 550);
+  }
+}
+
+// ===== INIT =====
+window.addEventListener('load', () => {
+  makeStars();
+  showOpening();
+});
+</script>
 </body>
 </html>
