@@ -1030,9 +1030,10 @@ function showStation(idx) {
   }
 
   // Suspect badge HTML
-  let badgeHtml = '';
-  if (s.suspect) {
-    badgeHtml = `<div class="suspect-badge">${s.suspect}${clearedHtml}</div>`;
+    const clearedHtml = s.cleared ? `<span class="cleared-badge">CLEARED</span>` : '';
+    let badgeHtml = '';
+    if (s.suspect) {
+        badgeHtml = `<div class="suspect-badge">${s.suspect}${clearedHtml}</div>`;
   } else if (s.isShared) {
     badgeHtml = `<div class="suspect-badge" style="border-color:rgba(108,61,138,0.5);color:#c5b0e8;background:rgba(108,61,138,0.08);">⚡ BOTH HOUSES COMPETE</div>`;
   }
